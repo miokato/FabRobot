@@ -1,10 +1,9 @@
 // define arduino pins
 #define SENSOR_PIN           A5 
-#define LEFT_MOTOR_GREEN_PIN 4
-#define LEFT_MOTOR_WHITE_PIN 5
-#define RIGHT_MOTOR_GREEN_PIN  6
-#define RIGHT_MOTOR_WHITE_PIN  7
-int motorPins[4] = {LEFT_MOTOR_GREEN_PIN, LEFT_MOTOR_WHITE_PIN, RIGHT_MOTOR_GREEN_PIN, RIGHT_MOTOR_WHITE_PIN};
+#define LEFT_MOTOR_WHITE_PIN 4
+#define LEFT_MOTOR_GREEN_PIN 5
+#define RIGHT_MOTOR_WHITE_PIN  6
+#define RIGHT_MOTOR_GREEN_PIN  7
 #define SPEED 60
 
 // status
@@ -25,33 +24,35 @@ void setup()
   state = STOP;
   // set motor speed
   analogWrite(3, SPEED);
-  for(int i=0; motorPins[i]!='\0'; i++){
-    pinMode(motorPins[i], OUTPUT);
-  }
   Serial.begin(9600);
+  if(!Serial){
+    ; // wait available serial 
+  }
   // set motor input pins to output
+  for(int i=3; i<6; i++){
+    pinMode(i, OUTPUT);
+  }
 }
 
 void loop()
 {
-  switch(Serial.read()){
-    case 'a':
-      forward();
-      break;
-    case 's':
-      back();
-      break;
-    case 'd':
-      right();
-      break;
-    case 'f':
-      left();
-      break;
-    case 'g':
-      stopMotor();
-      break;
-  }
+  int raw = analogRead(SENSOR_PIN);
+  int smoothed = meanFilter(raw);
 
+
+  Serial.print("Value is");
+  Serial.print(" : ");
+  Serial.println(smoothed);
+
+  if(smoothed<50){
+    stopMotor();
+    delay(100);
+  } else if(smoothed>=50 && smoothed<500){
+    forward();
+  } else {
+    right();
+    delay(100);
+  }
 }
 
 int meanFilter(int raw) {
@@ -96,8 +97,8 @@ void right(){
     stopMotor();
     delay(100);
   }
-  digitalWrite(RIGHT_MOTOR_GREEN_PIN, LOW);
-  digitalWrite(RIGHT_MOTOR_WHITE_PIN, HIGH);
+  digitalWrite(RIGHT_MOTOR_GREEN_PIN, HIGH);
+  digitalWrite(RIGHT_MOTOR_WHITE_PIN, LOW);
   digitalWrite(LEFT_MOTOR_GREEN_PIN, LOW);
   digitalWrite(LEFT_MOTOR_WHITE_PIN, LOW);
   Serial.println("right");
