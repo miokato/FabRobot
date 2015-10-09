@@ -3,17 +3,12 @@
 
 
 
-.build/uno/src/sketch.cpp : src/sketch.ino
+.build/uno/src/FabRobot.cpp : src/FabRobot.ino
 	@mkdir -p .build/uno/src
-	@echo [93msrc/sketch.ino[0m
-	@/usr/local/bin/ino preproc  -o $@ $^
-
-.build/uno/src/test.cpp : src/test.ino
-	@mkdir -p .build/uno/src
-	@echo [93msrc/test.ino[0m
+	@echo [93msrc/FabRobot.ino[0m
 	@/usr/local/bin/ino preproc  -o $@ $^
 
 
-all : .build/uno/src/sketch.cpp .build/uno/src/test.cpp
+all : .build/uno/src/FabRobot.cpp
 	@true
 

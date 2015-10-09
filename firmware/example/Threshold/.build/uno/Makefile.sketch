@@ -1,0 +1,14 @@
+
+
+
+
+
+.build/uno/src/threshold.cpp : src/threshold.ino
+	@mkdir -p .build/uno/src
+	@echo [93msrc/threshold.ino[0m
+	@/usr/local/bin/ino preproc  -o $@ $^
+
+
+all : .build/uno/src/threshold.cpp
+	@true
+

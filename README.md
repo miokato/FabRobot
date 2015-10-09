@@ -1,6 +1,6 @@
 # FabRobot
 
-## Robot car project.
+## DIY Robot car project.
 
 - firmware
 - body design
