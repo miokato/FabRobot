@@ -7,6 +7,6 @@
   firmware/src/FabRobot.inoファイルをArduinoに書き込んでください。
 - frame
 
-AIファイルもしくはPDFファイルをレーザー加工機で切り出してください。
+  AIファイルもしくはPDFファイルをレーザー加工機で切り出してください。
 
 - circuit
