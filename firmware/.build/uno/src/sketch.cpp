@@ -1,3 +1,14 @@
+#include <Arduino.h>
+
+void setup();
+void loop();
+int meanFilter(int raw);
+void forward();
+void back();
+void right();
+void left();
+void stopMotor();
+#line 1 "src/sketch.ino"
 // define arduino pins
 #define SENSOR_PIN           A5 
 #define LEFT_MOTOR_GREEN_PIN 4
