@@ -5,7 +5,8 @@
 - firmware
 
 firmware/src/FabRobot.inoファイルをArduinoに書き込んでください。
-- body design
+- frame
+
 AIファイルもしくはPDFファイルをレーザー加工機で切り出してください。
 
 - circuit
