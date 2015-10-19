@@ -1,0 +1,14 @@
+
+
+
+
+
+.build/uno/src/MeanFilter.cpp : src/MeanFilter.ino
+	@mkdir -p .build/uno/src
+	@echo [93msrc/MeanFilter.ino[0m
+	@/usr/local/bin/ino preproc  -o $@ $^
+
+
+all : .build/uno/src/MeanFilter.cpp
+	@true
+

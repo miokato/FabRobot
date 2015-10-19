@@ -2,17 +2,12 @@
 //#define TEST
 
 // define arduino pins
-#define SENSOR_PIN           A5 
-#define LEFT_MOTOR_GREEN_PIN 4
-#define LEFT_MOTOR_WHITE_PIN 5
+#define SENSOR_PIN             A5 
+#define LEFT_MOTOR_GREEN_PIN   4
+#define LEFT_MOTOR_WHITE_PIN   5
 #define RIGHT_MOTOR_GREEN_PIN  6
 #define RIGHT_MOTOR_WHITE_PIN  7
-int motorPins[4] = {
-  LEFT_MOTOR_GREEN_PIN,
-  LEFT_MOTOR_WHITE_PIN,
-  RIGHT_MOTOR_GREEN_PIN,
-  RIGHT_MOTOR_WHITE_PIN
-};
+
 #define SPEED 50
 
 // status
@@ -21,6 +16,7 @@ int motorPins[4] = {
 #define RIGHT   3
 #define LEFT    4
 #define STOP    5
+
 int state;
 
 // using mean filter
@@ -33,11 +29,13 @@ void setup()
   state = STOP;
   // set motor speed
   analogWrite(3, SPEED);
-  for(int i=0; motorPins[i]!='\0'; i++){
-    pinMode(motorPins[i], OUTPUT);
-  }
+  // set direction of motor pins
+  pinMode(LEFT_MOTOR_GREEN_PIN, OUTPUT);
+  pinMode(LEFT_MOTOR_WHITE_PIN, OUTPUT);
+  pinMode(RIGHT_MOTOR_GREEN_PIN, OUTPUT);
+  pinMode(RIGHT_MOTOR_WHITE_PIN, OUTPUT);
+
   Serial.begin(9600);
-  // set motor input pins to output
 }
 
 void loop()
@@ -72,10 +70,7 @@ void loop()
   } else {
     forward();
   }
-
-
 #endif
-
 }
 
 int meanFilter(int raw) {
