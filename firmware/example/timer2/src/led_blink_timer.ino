@@ -2,7 +2,6 @@
 #define LED_PIN 13
 #define SENSOR_PIN 0
 
-
 void setup()
 {
   Serial.begin(9600);
