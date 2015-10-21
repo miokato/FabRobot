@@ -1,10 +1,12 @@
+#include <MsTimer2.h>
+#include <TimerOne.h>
 // Arduinoで使用するピン番号の定義
 #define SENSOR_PIN  A5
 #define L_MOTOR_1   4
 #define L_MOTOR_2   5
 #define R_MOTOR_1  6
 #define R_MOTOR_2  7
-#define SPEED 90
+#define SPEED 50
 
 #define FORWARD 1
 #define BACK    2
@@ -13,7 +15,7 @@
 #define STOP    5
 // ロボットの状態(1~5)を使用するための定数 state
 int state;
-
+boolean led_state = false;
 
 
 void setup()
@@ -27,6 +29,14 @@ void setup()
   pinMode(R_MOTOR_2, OUTPUT);
   // シリアル通信を開始する
   Serial.begin(9600);
+  pinMode(13, OUTPUT);
+  Timer1.initialize(150000);
+  Timer1.attachInterrupt(led_blink);
+}
+
+void led_blink(){
+  led_state = !led_state;
+  digitalWrite(13, led_state);
 }
 
 void loop()
