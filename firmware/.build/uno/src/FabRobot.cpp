@@ -81,10 +81,7 @@ void loop()
   } else {
     forward();
   }
-
-
 #endif
-
 }
 
 int meanFilter(int raw) {
