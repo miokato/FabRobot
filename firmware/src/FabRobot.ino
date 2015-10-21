@@ -1,87 +1,51 @@
-//#define DEBUG
-//#define TEST
-
-// define arduino pins
-#define SENSOR_PIN             A5 
+// Arduinoで使用するピン番号の定義
 #define LEFT_MOTOR_GREEN_PIN   4
 #define LEFT_MOTOR_WHITE_PIN   5
 #define RIGHT_MOTOR_GREEN_PIN  6
 #define RIGHT_MOTOR_WHITE_PIN  7
+#define SPEED 90
 
-#define SPEED 50
-
-// status
 #define FORWARD 1
 #define BACK    2
 #define RIGHT   3
 #define LEFT    4
 #define STOP    5
-
+// ロボットの状態(1~5)を使用するための定数 state
 int state;
-
-// using mean filter
-#define BUFFER_LENGTH 5
-int buffer[BUFFER_LENGTH];
-int index = 0;
 
 void setup()
 {
   state = STOP;
-  // set motor speed
-  analogWrite(3, SPEED);
-  // set direction of motor pins
+  analogWrite(3, SPEED); // モーターの速度
+  // モーター制御用デジタルI/OピンをOUTPUTに設定
   pinMode(LEFT_MOTOR_GREEN_PIN, OUTPUT);
   pinMode(LEFT_MOTOR_WHITE_PIN, OUTPUT);
   pinMode(RIGHT_MOTOR_GREEN_PIN, OUTPUT);
   pinMode(RIGHT_MOTOR_WHITE_PIN, OUTPUT);
-
+  // シリアル通信を開始する
   Serial.begin(9600);
 }
 
 void loop()
 {
-  int smoothedValue = meanFilter(analogRead(SENSOR_PIN));
-  //int smoothedValue = analogRead(SENSOR_PIN);
-
-#ifdef TEST
+  // シリアル通信受信結果によって処理を切り替える
   switch(Serial.read()){
-    case 'a':
+    case 'a': // 前進
       forward();
       break;
-    case 's':
+    case 's': // 後退
       back();
       break;
-    case 'd':
+    case 'd': // 右回転
       right();
       break;
-    case 'f':
+    case 'f': // 左回転
       left();
       break;
-    case 'g':
+    case 'g': // 停止
       stopMotor();
       break;
   }
-#else
-  if(smoothedValue>500){
-    back();
-    delay(200);
-    right();
-    delay(300);
-  } else {
-    forward();
-  }
-#endif
-}
-
-int meanFilter(int raw) {
-  buffer[index] = raw;
-  index = (index + 1) % BUFFER_LENGTH;
-
-  long sum = 0;
-  for(int i=0; i<BUFFER_LENGTH; i++){
-    sum += buffer[i];
-  }
-  return (int)(sum / BUFFER_LENGTH);
 }
 
 void forward(){
@@ -93,13 +57,7 @@ void forward(){
   digitalWrite(RIGHT_MOTOR_WHITE_PIN, LOW);
   digitalWrite(LEFT_MOTOR_GREEN_PIN, HIGH);
   digitalWrite(LEFT_MOTOR_WHITE_PIN, LOW);
-#ifdef DEBUG
-  Serial.println(digitalRead(RIGHT_MOTOR_GREEN_PIN));
-  Serial.println(digitalRead(RIGHT_MOTOR_WHITE_PIN));
-  Serial.println(digitalRead(LEFT_MOTOR_GREEN_PIN));
-  Serial.println(digitalRead(LEFT_MOTOR_WHITE_PIN));
   Serial.println("forward");
-#endif
   state = FORWARD;
 }
 
@@ -112,13 +70,6 @@ void back(){
   digitalWrite(RIGHT_MOTOR_WHITE_PIN, HIGH);
   digitalWrite(LEFT_MOTOR_GREEN_PIN, LOW);
   digitalWrite(LEFT_MOTOR_WHITE_PIN, HIGH);
-#ifdef DEBUG
-  Serial.println(digitalRead(RIGHT_MOTOR_GREEN_PIN));
-  Serial.println(digitalRead(RIGHT_MOTOR_WHITE_PIN));
-  Serial.println(digitalRead(LEFT_MOTOR_GREEN_PIN));
-  Serial.println(digitalRead(LEFT_MOTOR_WHITE_PIN));
-  Serial.println("back");
-#endif
   state = BACK;
 }
 
@@ -131,13 +82,6 @@ void right(){
   digitalWrite(RIGHT_MOTOR_WHITE_PIN, LOW);
   digitalWrite(LEFT_MOTOR_GREEN_PIN, LOW);
   digitalWrite(LEFT_MOTOR_WHITE_PIN, HIGH);
-#ifdef DEBUG
-  Serial.println(digitalRead(RIGHT_MOTOR_GREEN_PIN));
-  Serial.println(digitalRead(RIGHT_MOTOR_WHITE_PIN));
-  Serial.println(digitalRead(LEFT_MOTOR_GREEN_PIN));
-  Serial.println(digitalRead(LEFT_MOTOR_WHITE_PIN));
-  Serial.println("right");
-#endif
   state = RIGHT;
 }
 
@@ -150,14 +94,6 @@ void left(){
   digitalWrite(RIGHT_MOTOR_WHITE_PIN, HIGH);
   digitalWrite(LEFT_MOTOR_GREEN_PIN, HIGH);
   digitalWrite(LEFT_MOTOR_WHITE_PIN, LOW);
-#ifdef DEBUG
-  Serial.println(digitalRead(RIGHT_MOTOR_GREEN_PIN));
-  Serial.println(digitalRead(RIGHT_MOTOR_GREEN_PIN));
-  Serial.println(digitalRead(RIGHT_MOTOR_WHITE_PIN));
-  Serial.println(digitalRead(LEFT_MOTOR_GREEN_PIN));
-  Serial.println(digitalRead(LEFT_MOTOR_WHITE_PIN));
-  Serial.println("left");
-#endif
   state = LEFT;
 }
 
@@ -166,8 +102,5 @@ void stopMotor(){
   digitalWrite(RIGHT_MOTOR_WHITE_PIN, LOW);
   digitalWrite(LEFT_MOTOR_GREEN_PIN, LOW);
   digitalWrite(LEFT_MOTOR_WHITE_PIN, LOW);
-#ifdef DEBUG
-  Serial.println("stop");
-#endif
   state = STOP;
 }
