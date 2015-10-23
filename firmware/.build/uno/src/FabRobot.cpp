@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <MsTimer2.h>
 #include <TimerOne.h>
+#include "MeanFilter.h"
 void setup();
 void led_blink();
 void loop();
@@ -12,6 +13,8 @@ void stopMotor();
 #line 1 "src/FabRobot.ino"
 //#include <MsTimer2.h>
 //#include <TimerOne.h>
+//#include "MeanFilter.h"
+
 // Arduinoで使用するピン番号の定義
 #define SENSOR_PIN  A5
 #define L_MOTOR_1   4
@@ -29,9 +32,11 @@ void stopMotor();
 int state;
 boolean led_state = false;
 
+MeanFilter myFilter;
 
 void setup()
 {
+  int i = myFilter.meanFilter(analogRead(A0));
   state = STOP;
   analogWrite(3, SPEED); // モーターの速度
   // モーター制御用デジタルI/OピンをOUTPUTに設定

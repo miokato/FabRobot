@@ -1,5 +1,7 @@
 #include <MsTimer2.h>
 #include <TimerOne.h>
+#include "MeanFilter.h"
+
 // Arduinoで使用するピン番号の定義
 #define SENSOR_PIN  A5
 #define L_MOTOR_1   4
@@ -17,6 +19,7 @@
 int state;
 boolean led_state = false;
 
+MeanFilter myFilter;
 
 void setup()
 {
@@ -41,7 +44,8 @@ void led_blink(){
 
 void loop()
 {
-  int value = analogRead(SENSOR_PIN);
+  int value = myFilter.meanFilter(analogRead(A0));
+  //int value = analogRead(SENSOR_PIN);
   Serial.println(value);
   if(value>500){
     back();
