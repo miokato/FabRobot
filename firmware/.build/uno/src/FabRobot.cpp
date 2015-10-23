@@ -1,10 +1,9 @@
 #include <Arduino.h>
-#include <MsTimer2.h>
 #include <TimerOne.h>
 void setup();
-void LedBlink();
+void ledBlink();
 int meanFilter(int raw);
-boolean checkDistance(int distance, boolean state);
+boolean checkDistance(int distance);
 void loop();
 void forward();
 void back();
@@ -12,7 +11,6 @@ void right();
 void left();
 void stopMotor();
 #line 1 "src/FabRobot.ino"
-//#include <MsTimer2.h>
 //#include <TimerOne.h>
 
 // Arduinoで使用するピン番号の定義
@@ -33,13 +31,12 @@ void stopMotor();
 #define LEFT    4
 #define STOP    5
 // ロボットの状態(1~5)を使用するための定数 state
-int state;
+int robot_state;
 
 // センサ用のフィルタ
 #define BUFFER_LENGTH 5
 #define THRESHOLD 500
 #define DEADZONE  80
-boolean wasNear = true;
 int buffer[BUFFER_LENGTH];
 int index = 0;
 
@@ -49,7 +46,7 @@ boolean led_state = false;
 
 void setup()
 {
-  state = STOP;
+  robot_state = STOP;
   analogWrite(3, SPEED); // モーターの速度
   // モーター制御用デジタルI/OピンをOUTPUTに設定
   pinMode(L_MOTOR_1, OUTPUT);
@@ -63,10 +60,10 @@ void setup()
   // タイマー処理でLEDを点滅
   pinMode(13, OUTPUT);
   Timer1.initialize(150000);
-  Timer1.attachInterrupt(LedBlink);
+  Timer1.attachInterrupt(ledBlink);
 }
 
-void LedBlink(){
+void ledBlink(){
   led_state = !led_state;
   digitalWrite(13, led_state);
 }
@@ -82,25 +79,24 @@ int meanFilter(int raw) {
   return (int)(sum / BUFFER_LENGTH);
 }
 
-boolean checkDistance(int distance, boolean state) {
-  boolean isNear = state;
+boolean checkDistance(int distance) {
+  boolean is_near;
   if(distance > (THRESHOLD + DEADZONE)) {
-    isNear = true;
+    is_near = true;
   } else if (distance < (THRESHOLD - DEADZONE)) {
-    isNear = false;
+    is_near = false;
   } else {
   }
-  return isNear;
+  return is_near;
 }
 
-void loop()
-{
+void loop() {
   int raw = analogRead(SENSOR_PIN);
   int smoothed = meanFilter(raw);
-  boolean isNear = checkDistance(smoothed, wasNear);
+  boolean is_near = checkDistance(smoothed);
   Serial.println(smoothed);
 
-  if(isNear) {
+  if(is_near) {
     back();
     delay(200);
     right();
@@ -108,11 +104,10 @@ void loop()
   } else {
     forward();
   }
-  wasNear = isNear;
 }
 
-void forward(){
-  if(state!=FORWARD){
+void forward() {
+  if(robot_state!=FORWARD){
     stopMotor();
     delay(1);
   }
@@ -121,11 +116,11 @@ void forward(){
   digitalWrite(L_MOTOR_1, HIGH);
   digitalWrite(L_MOTOR_2, LOW);
   Serial.println("forward");
-  state = FORWARD;
+  robot_state = FORWARD;
 }
 
 void back(){
-  if(state!=BACK){
+  if(robot_state!=BACK){
     stopMotor();
     delay(1);
   }
@@ -133,11 +128,11 @@ void back(){
   digitalWrite(R_MOTOR_2, HIGH);
   digitalWrite(L_MOTOR_1, LOW);
   digitalWrite(L_MOTOR_2, HIGH);
-  state = BACK;
+  robot_state = BACK;
 }
 
-void right(){
-  if(state!=RIGHT){
+void right() {
+  if(robot_state!=RIGHT){
     stopMotor();
     delay(1);
   }
@@ -145,11 +140,11 @@ void right(){
   digitalWrite(R_MOTOR_2, LOW);
   digitalWrite(L_MOTOR_1, LOW);
   digitalWrite(L_MOTOR_2, HIGH);
-  state = RIGHT;
+  robot_state = RIGHT;
 }
 
-void left(){
-  if(state!=LEFT){
+void left() {
+  if(robot_state!=LEFT){
     stopMotor();
     delay(1);
   }
@@ -157,13 +152,13 @@ void left(){
   digitalWrite(R_MOTOR_2, HIGH);
   digitalWrite(L_MOTOR_1, HIGH);
   digitalWrite(L_MOTOR_2, LOW);
-  state = LEFT;
+  robot_state = LEFT;
 }
 
-void stopMotor(){
+void stopMotor() {
   digitalWrite(R_MOTOR_1, LOW);
   digitalWrite(R_MOTOR_2, LOW);
   digitalWrite(L_MOTOR_1, LOW);
   digitalWrite(L_MOTOR_2, LOW);
-  state = STOP;
+  robot_state = STOP;
 }

@@ -1,7 +1,6 @@
-#include <MsTimer2.h>
 #include <TimerOne.h>
 
-// Arduinoで使用するピン番号の定義
+// 使用するArduinoのピン
 #define SENSOR_PIN  A5
 #define LED_PIN     13
 #define L_MOTOR_1   4
@@ -9,7 +8,7 @@
 #define R_MOTOR_1   6
 #define R_MOTOR_2   7
 
-// ロボットの速度 50~80くらいが適当
+// ロボットの速度 
 #define SPEED 50
 
 // ロボットの状態
@@ -18,23 +17,20 @@
 #define RIGHT   3
 #define LEFT    4
 #define STOP    5
-// ロボットの状態(1~5)を使用するための定数 state
+// ロボットの状態(1~5)を保存するための変数
 int state;
 
 // センサ用のフィルタ
 #define BUFFER_LENGTH 5
 #define THRESHOLD 500
 #define DEADZONE  80
-boolean wasNear = true;
 int buffer[BUFFER_LENGTH];
 int index = 0;
 
-
-// ロボットのLEDの状態を保存
+// ロボットのLEDの状態を保存するための変数
 boolean led_state = false;
 
-void setup()
-{
+void setup() {
   state = STOP;
   analogWrite(3, SPEED); // モーターの速度
   // モーター制御用デジタルI/OピンをOUTPUTに設定
@@ -49,10 +45,10 @@ void setup()
   // タイマー処理でLEDを点滅
   pinMode(13, OUTPUT);
   Timer1.initialize(150000);
-  Timer1.attachInterrupt(LedBlink);
+  Timer1.attachInterrupt(ledBlink);
 }
 
-void LedBlink(){
+void ledBlink() {
   led_state = !led_state;
   digitalWrite(13, led_state);
 }
@@ -68,25 +64,23 @@ int meanFilter(int raw) {
   return (int)(sum / BUFFER_LENGTH);
 }
 
-boolean checkDistance(int distance, boolean state) {
-  boolean isNear = state;
+boolean checkDistance(int distance) {
+  boolean is_near;
   if(distance > (THRESHOLD + DEADZONE)) {
-    isNear = true;
+    is_near = true;
   } else if (distance < (THRESHOLD - DEADZONE)) {
-    isNear = false;
+    is_near = false;
   } else {
   }
-  return isNear;
+  return is_near;
 }
 
-void loop()
-{
+void loop() {
   int raw = analogRead(SENSOR_PIN);
   int smoothed = meanFilter(raw);
-  boolean isNear = checkDistance(smoothed, wasNear);
-  Serial.println(smoothed);
+  boolean is_near = checkDistance(smoothed);
 
-  if(isNear) {
+  if(is_near) {
     back();
     delay(200);
     right();
@@ -94,11 +88,10 @@ void loop()
   } else {
     forward();
   }
-  wasNear = isNear;
 }
 
-void forward(){
-  if(state!=FORWARD){
+void forward() {
+  if(state!=FORWARD) {
     stopMotor();
     delay(1);
   }
@@ -110,8 +103,8 @@ void forward(){
   state = FORWARD;
 }
 
-void back(){
-  if(state!=BACK){
+void back() {
+  if(state!=BACK) {
     stopMotor();
     delay(1);
   }
@@ -122,8 +115,8 @@ void back(){
   state = BACK;
 }
 
-void right(){
-  if(state!=RIGHT){
+void right() {
+  if(state!=RIGHT) {
     stopMotor();
     delay(1);
   }
@@ -134,8 +127,8 @@ void right(){
   state = RIGHT;
 }
 
-void left(){
-  if(state!=LEFT){
+void left() {
+  if(state!=LEFT) {
     stopMotor();
     delay(1);
   }
@@ -146,7 +139,7 @@ void left(){
   state = LEFT;
 }
 
-void stopMotor(){
+void stopMotor() {
   digitalWrite(R_MOTOR_1, LOW);
   digitalWrite(R_MOTOR_2, LOW);
   digitalWrite(L_MOTOR_1, LOW);
