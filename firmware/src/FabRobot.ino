@@ -1,5 +1,7 @@
 #include <MsTimer2.h>
 #include <TimerOne.h>
+#include "MotorDriver.h"
+
 // Arduinoで使用するピン番号の定義
 #define SENSOR_PIN  A5
 #define L_MOTOR_1   4
@@ -17,16 +19,12 @@
 int state;
 boolean led_state = false;
 
+MotorDriver md(R_MOTOR_1, R_MOTOR_2, L_MOTOR_1, L_MOTOR_2);
 
 void setup()
 {
   state = STOP;
   analogWrite(3, SPEED); // モーターの速度
-  // モーター制御用デジタルI/OピンをOUTPUTに設定
-  pinMode(L_MOTOR_1, OUTPUT);
-  pinMode(L_MOTOR_2, OUTPUT);
-  pinMode(R_MOTOR_1, OUTPUT);
-  pinMode(R_MOTOR_2, OUTPUT);
   // シリアル通信を開始する
   Serial.begin(9600);
   pinMode(13, OUTPUT);
@@ -41,89 +39,33 @@ void led_blink(){
 
 void loop()
 {
-  int value = analogRead(SENSOR_PIN);
-  Serial.println(value);
-  if(value>500){
-    back();
-    delay(200);
-    right();
-    delay(300);
-  } else {
-    forward();
-  }
+  //int value = analogRead(SENSOR_PIN);
+  //Serial.println(value);
+  //if(value>500){
+  //  md.goBack();
+  //  delay(200);
+  //  md.turnLeft();
+  //  delay(300);
+  //} else {
+  //  md.goForward();
+  //}
   // シリアル通信受信結果によって処理を切り替える
-//  switch(Serial.read()){
-//    case 'a': // 前進
-//      forward();
-//      break;
-//    case 's': // 後退
-//      back();
-//      break;
-//    case 'd': // 右回転
-//      right();
-//      break;
-//    case 'f': // 左回転
-//      left();
-//      break;
-//    case 'g': // 停止
-//      stopMotor();
-//      break;
-//  }
-}
-
-void forward(){
-  if(state!=FORWARD){
-    stopMotor();
-    delay(100);
+  switch(Serial.read()){
+    case 'a': // 前進
+      md.goForward();
+      break;
+    case 's': // 後退
+      md.goBack();
+      break;
+    case 'd': // 右回転
+      md.turnRight();
+      break;
+    case 'f': // 左回転
+      md.turnLeft();
+      break;
+    case 'g': // 停止
+      md.doStop();
+      break;
   }
-  digitalWrite(R_MOTOR_1, HIGH);
-  digitalWrite(R_MOTOR_2, LOW);
-  digitalWrite(L_MOTOR_1, HIGH);
-  digitalWrite(L_MOTOR_2, LOW);
-  Serial.println("forward");
-  state = FORWARD;
 }
 
-void back(){
-  if(state!=BACK){
-    stopMotor();
-    delay(100);
-  }
-  digitalWrite(R_MOTOR_1, LOW);
-  digitalWrite(R_MOTOR_2, HIGH);
-  digitalWrite(L_MOTOR_1, LOW);
-  digitalWrite(L_MOTOR_2, HIGH);
-  state = BACK;
-}
-
-void right(){
-  if(state!=RIGHT){
-    stopMotor();
-    delay(100);
-  }
-  digitalWrite(R_MOTOR_1, HIGH);
-  digitalWrite(R_MOTOR_2, LOW);
-  digitalWrite(L_MOTOR_1, LOW);
-  digitalWrite(L_MOTOR_2, HIGH);
-  state = RIGHT;
-}
-
-void left(){
-  if(state!=LEFT){
-    stopMotor();
-    delay(100);
-  }
-  digitalWrite(R_MOTOR_1, LOW);
-  digitalWrite(R_MOTOR_2, HIGH);
-  digitalWrite(L_MOTOR_1, HIGH);
-  digitalWrite(L_MOTOR_2, LOW);
-  state = LEFT;
-}
-
-void stopMotor(){
-  digitalWrite(R_MOTOR_1, LOW);
-  digitalWrite(R_MOTOR_2, LOW);
-  digitalWrite(L_MOTOR_1, LOW);
-  digitalWrite(L_MOTOR_2, LOW);
-  state = STOP;
-}

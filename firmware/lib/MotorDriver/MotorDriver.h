@@ -20,6 +20,18 @@ class MotorDriver {
     int __pin3;
     int __pin4;
 
+    enum Flag {
+      ForwardFlag = 1,
+      BackFlag = 2,
+      RightFlag = 3,
+      LeftFlag = 4,
+      StopFlag = 5
+    } flag;
+    
+    
+
+
+
 };
 
 
